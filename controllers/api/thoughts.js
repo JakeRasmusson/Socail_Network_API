@@ -30,6 +30,11 @@ router.post('/', async (req, res) => {
     //todo create thought
     try {
         const thought = await Thought.create(req.body)
+        const updateUser = await User.findOneAndUpdate({ username: req.body.username}, {
+            $addToSet: {
+                thoughts: thought._id
+            }
+        })
         res.json(thought).status(200)
     } catch (err) {
         console.log(err)
