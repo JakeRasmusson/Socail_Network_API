@@ -72,12 +72,12 @@ router.put('/:id/friends/:friendId', async (req,res) => {
     const friendId = req.params.friendId
     console.log(friendId)
     try {
-        const user = User.findByIdAndUpdate(userId, {
-            $push: {
+        const user = await User.findByIdAndUpdate(userId, {
+            $addToSet: {
                 friends: friendId
             }
         })
-        res.json(user).status(200)
+        res.status(200).json(user)
     } catch (err) {
         console.log(err)
         res.status(500).send('Error adding friend')
@@ -86,9 +86,21 @@ router.put('/:id/friends/:friendId', async (req,res) => {
 })
 
 router.delete('/:id/friends/:friendId', async (req,res) => {
+    //todo remove user from users freindlist
     const userId = req.params.id
     const friendId = req.params.friendId
-    //todo remove user from users freindlist
+    console.log(friendId)
+    try {
+        const user = await User.findByIdAndUpdate(userId, {
+            $pull: {
+                friends: friendId
+            }
+        })
+        res.status(200).json(user)
+    } catch (err) {
+        console.log(err)
+        res.status(500).send('Error adding friend')
+    }
 })
 
 module.exports = router
