@@ -1,11 +1,11 @@
 const router = require('express').Router()
 
 
-router.get('/', (req,res) => {
+router.get('/', async (req,res) => {
     //todo Get all reactions
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     const id = req.params.id
     //todo Get reaction by id
 })

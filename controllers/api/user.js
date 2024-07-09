@@ -1,36 +1,93 @@
 const router = require('express').Router()
+const { User, Thought } = require('../../models/index')
 
-router.get('/', (req,res) => {
+router.get('/',  async (req,res) =>  {
     //todo Get all users
+    try {
+        const users = await User.find()
+        .populate({ path: 'thoughts' })
+        .populate({ path: 'friends' })
+        res.json(users).status(200)
+    } catch (err) {
+        console.log(err)
+        res.status(500).send('Error Retrieving users')
+    }
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     const id = req.params.id
-    //todo Get user by id
+    try {
+        const users = await User.findById(id)
+        .populate({ path: 'thoughts' })
+        .populate({ path: 'friends' })
+        res.json(users).status(200)
+    } catch (err) {
+        console.log(err)
+        res.status(500).send('Error Retrieving users')
+    }
 })
 
-router.post('/', (req,res) => {
-    //toDo Create user
+router.post('/', async (req,res) => {
+    try {
+        const user = await User.create(req.body)
+        res.json(user).status(200)
+    } catch (err) {
+        console.log(err)
+        res.status(500).send('Error Creating user')
+    }
+    
 })
 
-router.put('/:id', (req,res) => {
+router.put('/:id', async (req,res) => {
     //toDo update user by id
+    const id = req.params.id
+    try {
+        const users = await User.findByIdAndUpdate(id, req.body)
+        res.status(200).send('User Updated Succesfully')
+    } catch (err) {
+        console.log(err)
+        res.status(500).send('Error updating user')
+    }
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     const id = req.params.id
+    try {
+        const user = await User.findByIdAndDelete(id)
+        console.log(user)
+        for (let i = 0; i < user.thoughts.length; i++) {
+            const currentThought = user.thoughts[i]
+            const thought = await Thought.findByIdAndDelete(currentThought._id)
+        }
+        res.status(200).send('User Deleted Succesfully')
+    } catch (err) {
+        console.log(err)
+        res.status(500).send('Error deleting user')
+    }
     //todo Delete user by id and remove thoughts on delete
 })
 
-router.post('/:id/freinds/:freindId', (req,res) => {
+router.put('/:id/friends/:friendId', async (req,res) => {
     const userId = req.params.id
-    const freindId = req.params.freindId
+    const friendId = req.params.friendId
+    console.log(friendId)
+    try {
+        const user = User.findByIdAndUpdate(userId, {
+            $push: {
+                friends: friendId
+            }
+        })
+        res.json(user).status(200)
+    } catch (err) {
+        console.log(err)
+        res.status(500).send('Error adding friend')
+    }
     //todo add freind to users friend lsit
 })
 
-router.delete('/:id/freinds/:freindId', (req,res) => {
+router.delete('/:id/friends/:friendId', async (req,res) => {
     const userId = req.params.id
-    const freindId = req.params.freindId
+    const friendId = req.params.friendId
     //todo remove user from users freindlist
 })
 
