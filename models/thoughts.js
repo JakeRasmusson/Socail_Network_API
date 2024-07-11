@@ -47,21 +47,21 @@ thoughSchema.virtual('reactionCount').get(function() {
     return this.reactions.length
 })
 
-thoughSchema.pre('findOneAndDelete', async function(next) {
-    console.log(this.toObject() , 'success')
-    const _id = this.getQuery()
-    const { username, reactions } = this
-    console.log(username, reactions, _id)
-    const reactionDelete = await Reaction.deleteMany({_id: { $in: reactions }})
-    const userUpdate = await User.findOneAndUpdate({ username }, {
-        $pull: {
-            thoughts: _id
-        }
-    })
-    console.log(reactionDelete, userUpdate)
-    next()
+// thoughSchema.pre('findOneAndDelete', async function(next) {
+//     console.log(this.toObject() , 'success')
+//     const _id = this.getQuery()
+//     const { username, reactions } = this
+//     console.log(username, reactions, _id)
+//     const reactionDelete = await Reaction.deleteMany({_id: { $in: reactions }})
+//     const userUpdate = await User.findOneAndUpdate({ username }, {
+//         $pull: {
+//             thoughts: _id
+//         }
+//     })
+//     console.log(reactionDelete, userUpdate)
+//     next()
 
-})
+// })
 
 const Thought = model('Thought', thoughSchema)
 

@@ -53,12 +53,8 @@ router.put('/:id', async (req,res) => {
 router.delete('/:id', async (req, res) => {
     const id = req.params.id
     try {
-        const user = await User.findByIdAndDelete(id)
-        console.log(user)
-        for (let i = 0; i < user.thoughts.length; i++) {
-            const currentThought = user.thoughts[i]
-            const thought = await Thought.findByIdAndDelete(currentThought._id)
-        }
+        const userDelete = await User.findByIdAndDelete(id)
+        const thoughtCleanup = await Thought.deleteMany({ _id: { $in: userDelete.thoughts }})
         res.status(200).send('User Deleted Succesfully')
     } catch (err) {
         console.log(err)

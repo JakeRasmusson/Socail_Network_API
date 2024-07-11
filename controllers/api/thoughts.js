@@ -60,10 +60,7 @@ router.delete('/:id', async (req,res) => {
     //todo delete thought by id
     try {
         const thought = await Thought.findByIdAndDelete(id)
-        // for (let i = 0; i < thought.reactions.length; i++) {
-        //     const currentReaction = thought.reactions[i]
-        //     const reaction = await Reaction.findByIdAndDelete(currentReaction._id)
-        // }
+        const reactionDelete = await Reaction.deleteMany({ _id: { $in: thought.reactions }})
         res.status(200).send('Thought Deleted Succesfully')
     } catch (err) {
         console.log(err)
