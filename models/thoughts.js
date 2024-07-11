@@ -1,5 +1,14 @@
 const { Schema, model, SchemaTypes } = require('mongoose')
+const Reaction = require('./reaction')
+const  User  = require('./user')
 
+function dateFormat(date) {
+    return date.toLocaleDateString('en-us', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    })
+}
 
 
 
@@ -13,7 +22,7 @@ const thoughSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-        get: dateFormat
+        get: (timeStamp) => dateFormat(timeStamp)
     },
     username: {
         type: String,
@@ -27,19 +36,32 @@ const thoughSchema = new Schema({
             }
         ]
     }
+},{
+    toJSON: {
+        getters: true,
+        virtuals: true
+    }
 })
 
 thoughSchema.virtual('reactionCount').get(function() {
     return this.reactions.length
 })
 
-function dateFormat() {
-    return this.createdAt.toLocaleDateString('en-us', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+thoughSchema.pre('findOneAndDelete', async function(next) {
+    console.log(this.toObject() , 'success')
+    const _id = this.getQuery()
+    const { username, reactions } = this
+    console.log(username, reactions, _id)
+    const reactionDelete = await Reaction.deleteMany({_id: { $in: reactions }})
+    const userUpdate = await User.findOneAndUpdate({ username }, {
+        $pull: {
+            thoughts: _id
+        }
     })
-}
+    console.log(reactionDelete, userUpdate)
+    next()
+
+})
 
 const Thought = model('Thought', thoughSchema)
 

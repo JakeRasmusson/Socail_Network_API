@@ -17,10 +17,14 @@ const reactionSchema = new Schema({
         default: Date.now,
         get: dateFormat
     }
+},{
+    toJSON: {
+        getters: true
+    }
 })
 
-function dateFormat() {
-    return this.createdAt.toLocaleDateString('en-us', {
+function dateFormat(date) {
+    return date.toLocaleDateString('en-us', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
